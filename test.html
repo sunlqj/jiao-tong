@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+  <style type="text/css">
+		body, html {
+			width: 100%;
+			height: 100%;
+			margin:0;
+			font-family:"微软雅黑";
+		}
+		#container{
+			width:100%;
+			height:100%;
+        }
+        #result{
+            position: fixed;
+            top: 10px;
+            left: 20px;
+            width: 300px;
+            height: 40px;
+            line-height: 40px;
+            text-align: center;
+            background: #fff;
+            box-shadow: 0 2px 6px 0 rgba(27, 142, 236, 0.5);
+            border-radius: 7px;
+            z-index: 99;
+        }
+	</style>
+  <script type="text/javascript" src="https://api.map.baidu.com/api?type=webgl&v=1.0&ak=j1N8Ul6tqeBty1ZhmAxIu74YForOfQtU"></script>
+  <script type="text/javascript" src="track.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/mdui/0.4.3/css/mdui.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mdui/0.4.3/js/mdui.min.js"></script>
+  <title>DEMO</title>
+</head>
+<body class="mdui-drawer-body-left mdui-drawer-body-right">
+<div id="container" >
+</div>
+<div id="left-drawer" class="mdui-drawer mdui-color-white">
+  <div class="mdui-typo-headline mdui-m-l-2 mdui-m-t-2">Control Pannel</div>
+  <div class="mdui-typo">
+    <hr />
+  </div>
+  <ul class="mdui-list" style="max-width: 360px;margin-top:20%">
+    <li class="mdui-list-item mdui-ripple">
+      <i class="mdui-icon material-icons">location_city</i>
+      <div class="mdui-list-item-content mdui-m-l-5">Estate</div>
+      <label class="mdui-switch">
+        <input onclick="isflagES()" type="checkbox" />
+        <i class="mdui-switch-icon"></i>
+      </label>
+    </li>
+    <li class="mdui-list-item mdui-ripple">
+      <i class="mdui-icon material-icons">location_on</i>
+      <div class="mdui-list-item-content mdui-m-l-5"> Point</div>
+      <label class="mdui-switch">
+        <input onclick="isflagPT()" type="checkbox" />
+        <i class="mdui-switch-icon"></i>
+      </label>
+    </li>
+    <li class="mdui-list-item mdui-ripple">
+      <i class="mdui-icon material-icons">drive_eta</i>
+      <div class="mdui-list-item-content mdui-m-l-5">Polyline</div>
+      <label class="mdui-switch">
+        <input onclick="isflagRD()" type="checkbox" />
+        <i class="mdui-switch-icon"></i>
+      </label>
+    </li>
+    <li class="mdui-list-item mdui-ripple">
+      <i class="mdui-icon material-icons">call_made </i>
+      <div class="mdui-list-item-content mdui-m-l-5">Track</div>
+      <label class="mdui-switch">
+        <input onclick="isflagTK()" type="checkbox" />
+        <i class="mdui-switch-icon"></i>
+      </label>
+    </li>
+  </ul>
+</div>
+</body>
+</html>
+<script type="text/javascript">
+        var map = new BMapGL.Map("container");
+        map.enableScrollWheelZoom(true);
+        map.enableDragging();
+        //map.centerAndZoom(new BMapGL.Point(120.04121, 30.22800), 13);
+        map.centerAndZoom(new BMapGL.Point(121.53127, 29.942975), 13);
+
+        estate = new Array;
+        emarker = new Array;
+        p = new Array;
+        pmarker = new Array;
+        car = new Array;
+        flagCC = false;
+        flagPT = false;
+        flagRD = false;
+        flagES = false;
+        flagTK = false;
+        var cent = new BMapGL.Point(121.53127, 29.942975);
+
+
+
+
+        //合并点
+        p[1] = new BMapGL.Point(121.565002636317, 29.9012305455871);
+        p[2] = new BMapGL.Point(121.574182918879, 29.9016184647315);
+        p[3] = new BMapGL.Point(121.569685719116, 29.8935862779311);
+        p[4] = new BMapGL.Point(121.559782352135, 29.8940617635832);
+        p[5] = new BMapGL.Point(121.560515466673, 29.8997288097703);
+        p[6] = new BMapGL.Point(121.541333633101, 29.9016405192203);
+        p[7] = new BMapGL.Point(121.542316626721, 29.8991692537301);
+        p[8] = new BMapGL.Point(121.546995564874, 29.9003127593112);
+        p[9] = new BMapGL.Point(121.647786327532, 29.9144309005681);
+        p[10] = new BMapGL.Point(121.542025353765, 29.9068706049224);
+        p[11] = new BMapGL.Point(121.541653384093, 29.9023251271705);
+        p[12] = new BMapGL.Point(121.604532315555, 29.9097511062244);
+        p[13] = new BMapGL.Point(121.592341115042, 29.9085552371941);
+        p[14] = new BMapGL.Point(121.595302343762, 29.9078472646252);
+        p[15] = new BMapGL.Point(121.564408243775, 29.8883241156637);
+        p[16] = new BMapGL.Point(121.564712549977, 29.8924977175281);
+        p[17] = new BMapGL.Point(121.564051252135, 29.8844583739502);
+        p[18] = new BMapGL.Point(121.557176242314, 29.909589162615);
+        p[19] = new BMapGL.Point(121.536885111075, 29.9189952755781);
+        p[20] = new BMapGL.Point(121.549066899457, 29.9282237615816);
+        p[21] = new BMapGL.Point(121.552733908669, 29.9173340935858);
+        p[22] = new BMapGL.Point(121.545616580757, 29.9189359312907);
+        p[23] = new BMapGL.Point(121.526459749003, 29.9214517490366);
+        p[24] = new BMapGL.Point(121.527910152181, 29.9253943967544);
+        p[25] = new BMapGL.Point(121.512845701284, 29.9415280769418);
+        p[26] = new BMapGL.Point(121.506662556215, 29.9406912542088);
+        p[27] = new BMapGL.Point(121.515574847295, 29.9367426521272);
+        p[28] = new BMapGL.Point(121.511733168325, 29.9336982961609);
+        p[29] = new BMapGL.Point(121.516652142873, 29.9315036932586);
+        p[30] = new BMapGL.Point(121.507689380497, 29.9364942983311);
+        p[31] = new BMapGL.Point(121.509612791831, 29.9389561351815);
+        p[32] = new BMapGL.Point(121.504128775932, 29.9379009073941);
+        p[33] = new BMapGL.Point(121.521922035976, 29.918555833606);
+        p[34] = new BMapGL.Point(121.520985243465, 29.9357767904169);
+        p[35] = new BMapGL.Point(121.44083000787, 29.9403602408276);
+        p[36] = new BMapGL.Point(121.516930724029, 29.9524290886981);
+        p[37] = new BMapGL.Point(121.517295997957, 29.9458014378084);
+        p[38] = new BMapGL.Point(121.509641388488, 29.9466094353852);
+        p[39] = new BMapGL.Point(121.508449916484, 29.9440014743796);
+        p[40] = new BMapGL.Point(121.512932432232, 29.9443170707257);
+        p[41] = new BMapGL.Point(121.442232808042, 29.9770608564199);
+        p[42] = new BMapGL.Point(121.435354007551, 29.9575521813584);
+        p[43] = new BMapGL.Point(121.473421421982, 29.9822704701525);
+        p[44] = new BMapGL.Point(121.458921749682, 29.9879499520752);
+        p[45] = new BMapGL.Point(121.457963168771, 29.9924607910583);
+        p[46] = new BMapGL.Point(121.453842371008, 29.9862149305738);
+        p[47] = new BMapGL.Point(121.447415459511, 29.9629101023639);
+        p[48] = new BMapGL.Point(121.460259168485, 29.9641206163075);
+
+        //小区
+        estate[1] = new BMapGL.Point(121.56525975852746, 29.898243514762118);
+        estate[2] = new BMapGL.Point(121.57337739687591, 29.90137348859073);
+        estate[3] = new BMapGL.Point(121.57637096495303, 29.901232002575455);
+        estate[4] = new BMapGL.Point(121.57420499855554, 29.9040261272217);
+        estate[5] = new BMapGL.Point(121.57277831513491, 29.899842240538128);
+        estate[6] = new BMapGL.Point(121.57136013687082, 29.89341375333531);
+        estate[7] = new BMapGL.Point(121.57185997651405, 29.892580997220115);
+        estate[8] = new BMapGL.Point(121.56992624185355, 29.890709591851543);
+        estate[9] = new BMapGL.Point(121.56042128922172, 29.89294837947611);
+        estate[10] = new BMapGL.Point(121.5674190163794, 29.896728190572855);
+        estate[11] = new BMapGL.Point(121.5678632239624, 29.894498856675824);
+        estate[12] = new BMapGL.Point(121.561458683865, 29.90047064872629);
+        estate[13] = new BMapGL.Point(121.56208802772203, 29.896874287269107);
+        estate[14] = new BMapGL.Point(121.56027402999952, 29.897718785023063);
+        estate[15] = new BMapGL.Point(121.53983523867011, 29.90089749289805);
+        estate[16] = new BMapGL.Point(121.53958996443545, 29.89846278496295);
+        estate[17] = new BMapGL.Point(121.5387943145845, 29.900815888906273);
+        estate[18] = new BMapGL.Point(121.55763241981774, 29.900794806657395);
+        estate[19] = new BMapGL.Point(121.54967808173298, 29.900437519907978);
+        estate[20] = new BMapGL.Point(121.5478820734766, 29.89963831693266);
+        estate[21] = new BMapGL.Point(121.54975203024252, 29.89805264218522);
+        estate[22] = new BMapGL.Point(121.5438089757363, 29.8988077420106);
+        estate[23] = new BMapGL.Point(121.5418464135537, 29.89963354690243);
+        estate[24] = new BMapGL.Point(121.54278655135435, 29.90140163205981);
+        estate[25] = new BMapGL.Point(121.54191058310946, 29.902948749235318);
+        estate[26] = new BMapGL.Point(121.54334147778634, 29.90213883300231);
+        estate[27] = new BMapGL.Point(121.64320423282214, 29.91415495965591);
+        estate[28] = new BMapGL.Point(121.5450345707737, 29.907085302484713);
+        estate[29] = new BMapGL.Point(121.5442123544356, 29.899745748494038);
+        estate[30] = new BMapGL.Point(121.53931017550649, 29.90886228723023);
+        estate[31] = new BMapGL.Point(121.54043087091797, 29.904119366116877);
+        estate[32] = new BMapGL.Point(121.54212542544838, 29.897000180891425);
+        estate[33] = new BMapGL.Point(121.54905723315113, 29.899196446280598);
+        estate[34] = new BMapGL.Point(121.54520471253213, 29.899315951413676);
+        estate[35] = new BMapGL.Point(121.53860840576775, 29.903458948211746);
+        estate[36] = new BMapGL.Point(121.54676947089945, 29.903943040028544);
+        estate[37] = new BMapGL.Point(121.64945265820164, 29.91332849366645);
+        estate[38] = new BMapGL.Point(121.65070209157233, 29.915809248382168);
+        estate[39] = new BMapGL.Point(121.60488157027021, 29.91040496466305);
+        estate[40] = new BMapGL.Point(121.60504083534556, 29.90775034278563);
+        estate[41] = new BMapGL.Point(121.60508009848277, 29.906946743088287);
+        estate[42] = new BMapGL.Point(121.59332748575382, 29.907009316379632);
+        estate[43] = new BMapGL.Point(121.5912070005643, 29.908532835224882);
+        estate[44] = new BMapGL.Point(121.5937618757559, 29.906441030683883);
+        estate[45] = new BMapGL.Point(121.59458239788981, 29.90882092486897);
+        estate[46] = new BMapGL.Point(121.60667539205097, 29.91395005521241);
+        estate[47] = new BMapGL.Point(121.60264167692252, 29.912089241994966);
+        estate[48] = new BMapGL.Point(121.60680243850089, 29.912977920670052);
+        estate[49] = new BMapGL.Point(121.60513014577764, 29.912533228703907);
+        estate[50] = new BMapGL.Point(121.58882681525193, 29.90446305428473);
+        estate[51] = new BMapGL.Point(121.6050173967582, 29.911564238590245);
+        estate[52] = new BMapGL.Point(121.56801449052548, 29.88707508444034);
+        estate[53] = new BMapGL.Point(121.55832435850097, 29.895135816169986);
+        estate[54] = new BMapGL.Point(121.56539761159269, 29.891432633201752);
+        estate[55] = new BMapGL.Point(121.56379442641057, 29.89160049743064);
+        estate[56] = new BMapGL.Point(121.56339863300302, 29.893601843974313);
+        estate[57] = new BMapGL.Point(121.56546491533639, 29.892737732534897);
+        estate[58] = new BMapGL.Point(121.5655071635428, 29.89311588049903);
+        estate[59] = new BMapGL.Point(121.56114104303677, 29.8937125763454);
+        estate[60] = new BMapGL.Point(121.55924271778285, 29.894450282341417);
+        estate[61] = new BMapGL.Point(121.56106573359436, 29.889242148801674);
+        estate[62] = new BMapGL.Point(121.56352547374098, 29.88633983174053);
+        estate[63] = new BMapGL.Point(121.56408605320955, 29.884574508383956);
+        estate[64] = new BMapGL.Point(121.56583037925502, 29.88419783804312);
+        estate[65] = new BMapGL.Point(121.56841285847663, 29.888588701694264);
+        estate[66] = new BMapGL.Point(121.56595616987384, 29.882173505150664);
+        estate[67] = new BMapGL.Point(121.5633179247445, 29.88500618643289);
+        estate[68] = new BMapGL.Point(121.56057730422773, 29.88860633761772);
+        estate[69] = new BMapGL.Point(121.56151109190674, 29.88810830576456);
+        estate[70] = new BMapGL.Point(121.59748245326166, 29.914335763592288);
+        estate[71] = new BMapGL.Point(121.56042128922172, 29.89294837947611);
+        estate[72] = new BMapGL.Point(121.56577041197242, 29.902735069456444);
+        estate[73] = new BMapGL.Point(121.56535069758743, 29.900274010451433);
+        estate[74] = new BMapGL.Point(121.5636296771801, 29.903669587678593);
+        estate[75] = new BMapGL.Point(121.55885840561801, 29.91075471509625);
+        estate[76] = new BMapGL.Point(121.54184877250395, 29.90759178994639);
+        estate[77] = new BMapGL.Point(121.53855195624952, 29.905269023841306);
+        estate[78] = new BMapGL.Point(121.53756442205356, 29.903572355737527);
+        estate[79] = new BMapGL.Point(121.561124171961, 29.90278552117575);
+        estate[80] = new BMapGL.Point(121.55545806145018, 29.90745412146732);
+        estate[81] = new BMapGL.Point(121.55721225987321, 29.910558651281534);
+        estate[82] = new BMapGL.Point(121.53762717677816, 29.919126521936967);
+        estate[83] = new BMapGL.Point(121.53992306240657, 29.917588403772275);
+        estate[84] = new BMapGL.Point(121.53835072234075, 29.9176197944168);
+        estate[85] = new BMapGL.Point(121.53163948277623, 29.921646382186506);
+        estate[86] = new BMapGL.Point(121.5410966536397, 29.9238710352076);
+        estate[87] = new BMapGL.Point(121.52477645113991, 29.921679909007274);
+        estate[88] = new BMapGL.Point(121.52814304686805, 29.921223589066155);
+        estate[89] = new BMapGL.Point(121.5279101521816, 29.92539439675448);
+        estate[90] = new BMapGL.Point(121.55087104402611, 29.916387497391945);
+        estate[91] = new BMapGL.Point(121.54381755365561, 29.918038845424075);
+        estate[92] = new BMapGL.Point(121.54381755365561, 29.918038845424075);
+        estate[93] = new BMapGL.Point(121.54505928495487, 29.919828897753447);
+        estate[94] = new BMapGL.Point(121.5483764496257, 29.919167240141743);
+        estate[95] = new BMapGL.Point(121.54701206189556, 29.91960582771026);
+        estate[96] = new BMapGL.Point(121.55169611158588, 29.92012956090936);
+        estate[97] = new BMapGL.Point(121.55580345991866, 29.922829619339545);
+        estate[98] = new BMapGL.Point(121.55305572751716, 29.92691232891798);
+        estate[99] = new BMapGL.Point(121.54861332111064, 29.91548532731932);
+        estate[100] = new BMapGL.Point(121.55256501914947, 29.917333988722646);
+        estate[101] = new BMapGL.Point(121.54717599456633, 29.92642117577637);
+        estate[102] = new BMapGL.Point(121.55539280045322, 29.941084648666614);
+        estate[103] = new BMapGL.Point(121.51796918361471, 29.952668530503864);
+        estate[104] = new BMapGL.Point(121.51729599795728, 29.945801437808413);
+        estate[105] = new BMapGL.Point(121.5158922644458, 29.95218964689237);
+        estate[106] = new BMapGL.Point(127.51405533028871, 29.941102456561026);//
+        estate[107] = new BMapGL.Point(121.50666255621536, 29.940691254208875);
+        estate[108] = new BMapGL.Point(121.51689454702161, 29.935916110504657);
+        estate[109] = new BMapGL.Point(121.51425514756968, 29.9375691937498);
+        estate[110] = new BMapGL.Point(127.51173316832583, 29.93369829616091);//
+        estate[111] = new BMapGL.Point(121.51665214287304, 29.9315036932586);
+        estate[112] = new BMapGL.Point(121.50768938049771, 29.936494298331137);
+        estate[113] = new BMapGL.Point(121.50961279183129, 29.938956135181524);
+        estate[114] = new BMapGL.Point(121.50964138848887, 29.9466094353852);
+        estate[115] = new BMapGL.Point(121.5084499164846, 29.944001474379625);
+        estate[116] = new BMapGL.Point(127.5116360722799, 29.941953697322575);//
+        estate[117] = new BMapGL.Point(121.51293243223212, 29.944317070725738);
+        estate[118] = new BMapGL.Point(121.50412877593203, 29.93790090739415);
+        estate[119] = new BMapGL.Point(121.5219220359761, 29.918555833606003);
+        estate[120] = new BMapGL.Point(121.52098524346516, 29.935776790416913);
+        estate[121] = new BMapGL.Point(121.44223280804252, 29.977060856419904);
+        estate[122] = new BMapGL.Point(121.4353540075513, 29.95755218135841);
+        estate[123] = new BMapGL.Point(121.44083000787047, 29.94036024082761);
+        estate[124] = new BMapGL.Point(121.47342142198247, 29.9822704701525);
+        estate[125] = new BMapGL.Point(121.45892174968284, 29.98794995207524);
+        estate[126] = new BMapGL.Point(121.45733156926961, 29.992583199330937);
+        estate[127] = new BMapGL.Point(121.45859476827394, 29.992338382785864);
+        estate[128] = new BMapGL.Point(121.4538423710089, 29.986214930573873);
+        estate[129] = new BMapGL.Point(121.44741545951108, 29.962910102363935);
+        estate[130] = new BMapGL.Point(121.460259168485, 29.964120616307568);
+        //标记
+        for (i = 1; i <= 48; i++) {
+        pmarker[i] = new BMapGL.Marker(p[i]);
+        pmarker[i].disableMassClear();
+        }
+        for (j = 1; j <= 130; j++) {
+        emarker[j] = new BMapGL.Marker(estate[j]);
+        emarker[j].disableMassClear();
+        }
+        var centM = new BMapGL.Marker(cent);
+
+        //镇子标记
+        function removeES() {
+        for (j = 1; j <= 130; j++) {
+        //marker[j].setLabel(new BMapGL.Label(j));
+        map.removeOverlay(emarker[j]);
+        }
+        }
+        function addES() {
+        for (j = 1; j <= 130; j++) {
+        map.addOverlay(emarker[j]);
+        emarker[j].setLabel(new BMapGL.Label(j));
+        }
+        }
+
+        //集中点标记
+        function removePT() {
+        map.removeOverlay(centM);
+        for (i = 1; i <= 48; i++) {
+        map.removeOverlay(pmarker[i]);
+        }
+        }
+        function addPT() {
+        for (i = 1; i <= 48; i++) {
+        pmarker[i].setLabel(new BMapGL.Label(i));
+        map.addOverlay(pmarker[i]);
+        }
+        map.addOverlay(centM);
+
+        }
+        //路线查询
+        function addRD() {
+
+        }
+        function removeRD() {
+
+        }
+
+
+        function isflagPT() {
+        flagPT = !flagPT;
+        if (flagPT == true) {
+        addPT();
+        }
+        else {
+        removePT();
+        }
+        }
+        function isflagES() {
+        flagES = !flagES;
+        if (flagES == true) {
+        addES();
+        }
+        else {
+        removeES();
+        }
+        }
+var d0 = new BMapGL.DrivingRoute(map, {renderOptions:{map: map, autoViewport: true}});
+var d1 = new BMapGL.DrivingRoute(map, {renderOptions:{map: map, autoViewport: true}});
+//var d2 = new BMapGL.DrivingRoute(map, {renderOptions:{map: map, autoViewport: true}});
+//var d3 = new BMapGL.DrivingRoute(map, {renderOptions:{map: map, autoViewport: true}});
+
+var pts
+var polyline;
+var point = [];
+//p1 = new BMapGL.Point(120.04121, 30.22800);
+//p2
+        function isflagRD() {
+        flagRD = !flagRD;
+
+        if (flagRD == true) {
+          d0.search(p[1],p[2]);
+          //d0.search(p1,p2);
+          d0.setSearchCompleteCallback(function () {
+        // 通过驾车实例，获得一系列点的数组
+          var pts = d0.getResults().getPlan(0).getRoute(0).getPath();
+
+          for (var i = 0; i < pts.length; i++) {
+              point.push(new BMapGL.Point(pts[i].lng, pts[i].lat));}
+         polyline = new BMapGL.Polyline(point);
+        //map.addOverlay(polyline)
+      })
+          setTimeout(function(){
+            d1.search(p[2],p[3]);
+          }, 100);
+         d1.setSearchCompleteCallback(function () {
+        // 通过驾车实例，获得一系列点的数组
+          var pts = d1.getResults().getPlan(0).getRoute(0).getPath()
+          for (var i = 0; i < pts.length; i++) {
+              point.push(new BMapGL.Point(pts[i].lng, pts[i].lat));}
+      })
+
+        }
+
+        else {
+        d0.clearResults();
+        d1.clearResults();
+        point = [];
+
+        }
+
+    }
+
+    function start () {
+        trackAni = new BMapGLLib.TrackAnimation(map, polyline, {
+            //zoom:1,
+            overallView: true,
+            tilt: 30,
+            duration: 10000,
+            delay: 300
+        });
+        trackAni.start();
+       console.log(polyline);
+        polyline=0;
+   }
+
+      function isflagTK() {
+            flagTK = !flagTK;
+            if (flagTK == true) {
+           polyline = new BMapGL.Polyline(point);
+           setTimeout('start()', 100);
+         }
+         else{
+
+         map.clearOverlays();
+         }
+      }
+    </script>
